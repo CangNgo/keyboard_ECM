@@ -43,7 +43,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
- 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,8 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api', 
-    'rest_framework', 
+    'api',
+    'rest_framework',
     'corsheaders'
 ]
 
@@ -100,11 +100,11 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Django_ECM',  
-        'USER': 'root',  
-        'PASSWORD': 'root',  
-        'HOST': 'localhost',  
-        'PORT': '3306',  
+        'NAME': 'Django_ECM',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
