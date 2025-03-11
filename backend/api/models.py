@@ -24,6 +24,7 @@ class Category(models.Model):
 
 
 class Property(models.Model):
+    category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
 
