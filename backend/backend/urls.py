@@ -25,7 +25,10 @@ urlpatterns = [
     path("api/category", views.updateCategory, name="update_category"),
     path("api/token", TokenObtainPairView.as_view(), name="get_token"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh_token"),
-    path("api-auth/", include("rest_framework.urls"))
+    path("api-auth/", include("rest_framework.urls")),
+    # Address
+    path("api/address/", views.createAddress, name="create_address"),
+    path("api/address/<int:pk>/", views.updateAddress, name="update_address")
 
 
 ]

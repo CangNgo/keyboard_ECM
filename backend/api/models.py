@@ -15,7 +15,7 @@ class User(models.Model):
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     city = models.CharField(max_length=255)
-    ward = models.CharField(max_length=255)
+    ward = models.CharField(max_length=255) 
     district = models.CharField(max_length=255)
     specific_address = models.CharField(max_length=255)
 
