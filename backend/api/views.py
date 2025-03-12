@@ -3,6 +3,9 @@ from . import models
 from rest_framework import generics, mixins
 from . import serializer
 from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser
+from rest_framework.response import Response
 
 # Create your views here.
 class CreateUserView (generics.CreateAPIView):
@@ -61,3 +64,12 @@ class PropertyView(
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+class ImageView(
+    generics.CreateAPIView,
+    generics.UpdateAPIView,
+):
+    queryset = models.Product.objects.all()
+    serializer_class = serializer.ProductSerializer
+    permission_classes = [AllowAny]
+

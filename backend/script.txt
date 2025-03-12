@@ -1,0 +1,2 @@
+docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:latest
+docker run -d -p 9000:9000 -p 9001:9001 --name ecm -v C:\Users\Desktop\data:/data -e "MINIO_ROOT_USER=root" -e "MINIO_ROOT_PASSWORD=changeme123"  quay.io/minio/minio server /data --console-address ":9001"

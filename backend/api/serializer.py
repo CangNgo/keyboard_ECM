@@ -1,6 +1,7 @@
 from .models import *
 from rest_framework import serializers
 from django.contrib.auth.hashers import  make_password
+from . import file_uploader
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,9 +30,26 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ProductSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(write_only = True)
+    properties = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Property.objects.all()
+    )
+
     class Meta:
         model = Product
-        fields = "__all__"
+        fields = ['id', 'name', 'dimensions_mm', 'weight_in_grams', 'total_quantity','image','category', 'properties']
+
+    def create(self, validated_data):
+        image = validated_data.pop('image')
+
+        image_url = file_uploader.upload_image(image)
+        properties_data = validated_data.pop('properties')
+
+        product = Product.objects.create(image_url=image_url, **validated_data)
+        product.properties.set(properties_data)
+
+        return product
+
 
 class VariantSerializer(serializers.ModelSerializer):
     class Meta:
