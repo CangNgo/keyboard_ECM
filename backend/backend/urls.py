@@ -30,7 +30,7 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     # Address
     path("api/address/", views.createAddress, name="create_address"),
-    path("api/address/<int:pk>/", views.updateAddress, name="update_address")
+    path("api/address/<int:pk>/", views.updateAddress, name="update_address"),
 
 
 ]

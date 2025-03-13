@@ -26,6 +26,8 @@ class AddressSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()  
         return instance 
+    def delete(self, instance):
+        return instance.delete()
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

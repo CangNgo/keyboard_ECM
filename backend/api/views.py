@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status,generics, mixins
 from . import serializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # Create your views here.
 class CreateUserView (generics.CreateAPIView):
@@ -85,8 +85,8 @@ def createAddress(request):
         return Response(seria.data, status=status.HTTP_201_CREATED)
     return Response(seria.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Cập nhật địa chỉ
-@api_view(["PUT"])
+# Cập nhật và xóa địa chỉ
+@api_view(["PUT", "DELETE"])
 @permission_classes([AllowAny])
 def updateAddress(request, pk): 
     # Kiểm tra địa chỉ có tồn tại không
@@ -95,17 +95,23 @@ def updateAddress(request, pk):
     except models.Address.DoesNotExist:
         return Response({"error": "Không tìm thấy địa chỉ cần cập nhật"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Kiểm tra user có tồn tại không
-    if "user" in request.data and not models.User.objects.filter(id=request.data["user"]).exists():
-        return Response({"error": "Người dùng không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "PUT": 
+            # Kiểm tra user có tồn tại không
+        if "user" in request.data and not models.User.objects.filter(id=request.data["user"]).exists():
+            return Response({"error": "Người dùng không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Cập nhật dữ liệu
-    seria = serializer.AddressSerializer(instance, data=request.data, partial=True) 
-    if seria.is_valid():
-        seria.save()
-        return Response(seria.data, status=status.HTTP_200_OK)
-    
-    return Response(seria.errors, status=status.HTTP_400_BAD_REQUEST) 
+        # Cập nhật dữ liệu
+        seria = serializer.AddressSerializer(instance, data=request.data, partial=True) 
+        if seria.is_valid():
+            seria.save()
+            return Response(seria.data, status=status.HTTP_200_OK)
+        
+        return Response(seria.errors, status=status.HTTP_400_BAD_REQUEST) 
+    elif request.method == "DELETE": 
+        serializerInstance = serializer.AddressSerializer(instance )
+        serializerInstance.delete(instance)
+        return Response({"message": "Xóa địa chỉ thành công"}, status = status.HTTP_200_OK)
+
 # Kiểm tra nếu dữ liệu chưa nhập đủ 
 def validata_data(request, required_field): 
     miss_field = [field for field in required_field if field not in request.data]
