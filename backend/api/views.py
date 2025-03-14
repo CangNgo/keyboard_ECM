@@ -1,11 +1,12 @@
-from django.shortcuts import render
-from . import models
-from rest_framework import generics
+from rest_framework import generics, mixins
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status,generics, mixins
+
+from . import models
 from . import serializer
-from rest_framework.permissions import AllowAny, IsAuthenticated
+
 
 # Create your views here.
 class CreateUserView (generics.CreateAPIView):
@@ -29,6 +30,7 @@ class CategoryView (
         if 'pk' in kwargs:
             return self.retrieve(request, *args, **kwargs)
         return self.list(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
@@ -63,27 +65,6 @@ class PropertyView(
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
-    
-# Address 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def createAddress(request):
-    # kiểm tra có nhập thiếu dữ liệu hay không
-    required_field = ["user", "city", "district", "ward"]
-    
-    valid = validata_data(request, required_field)
-    if valid :
-        return valid
-    
-    # kiểm tra user có tồn tại hay không 
-    user_id =request.data.get("user")
-    if not models.User.objects.filter(id = user_id).exists(): 
-        return Response({"Error": "User không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
-    seria = serializer.AddressSerializer(data=request.data)
-    if seria.is_valid():
-        seria.save()
-        return Response(seria.data, status=status.HTTP_201_CREATED)
-    return Response(seria.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Cập nhật và xóa địa chỉ
 @api_view(["PUT", "DELETE"])
@@ -117,3 +98,11 @@ def validata_data(request, required_field):
     miss_field = [field for field in required_field if field not in request.data]
     if miss_field : 
         return Response({"Error": f"Nhập thiếu dữ liệu: {', '.join(miss_field)}"}, status= status.HTTP_400_BAD_REQUEST)
+class ImageView(
+    generics.CreateAPIView,
+    generics.UpdateAPIView,
+):
+    queryset = models.Product.objects.all()
+    serializer_class = serializer.ProductSerializer
+    permission_classes = [AllowAny]
+
