@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true, // Bỏ qua kiểm tra tệp .d.ts
+    "strict": true,       // Bật kiểm tra nghiêm ngặt
+    "jsx": "react-jsx",    // Cấu hình JSX cho React
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": ["src/**/*"], // Chỉ kiểm tra thư mục src
+  "exclude": ["node_modules", "dist", "build"] // Loại trừ thư mục không cần thiết
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload file</title>
+</head>
+
+<body>
+    <div>
+        <label for="file-product">Import Excel file</label>
+        <input type="file" name="file-product" id="file-product" accept=".xlsx, .xls"
+            onchange="handleFileImport(event)" />
+        <button onclick="handleSaveFile()">Lưu file</button>
+    </div>
+
+    <table class="table-auto">
+        <tr>
+            <th>name</th>
+            <th>price</th>
+            <th>image</th>
+            <th>categoryId</th>
+        </tr>
+        <tbody id="table-body">
+
+        </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <script>
+
+        const api = 'http://localhost:8081/api/product'
+
+        let data = []
+        //xu ly file 
+        const handleFileImport = (e) => {
+
+            const file = e.target.files[0]
+
+            const reader = new FileReader()
+
+            reader.onload = (e) => {
+
+                const dataFile = e.target.result
+                const workBook = XLSX.read(dataFile, { type: "binary" })
+                const sheetName = workBook.SheetNames[0]
+
+                const sheet = workBook.Sheets[sheetName]
+                const jsonData = XLSX.utils.sheet_to_json(sheet)
+
+                console.log(jsonData)
+                data = jsonData
+            }
+
+            reader.readAsBinaryString(file)
+
+
+            const tableBody = document.querySelector("#table-body")
+
+            let str = ''
+
+            data.forEach(item => {
+                str += ` <tr>
+    <td>${item.name}</td>
+    <td>${item.price}</td>
+    <td>${item.iamge}</td>
+    <td>${item.categoryId}</td>
+   </tr>`
+            })
+            tableBody.innerHTML = str
+        }
+
+        const handleSaveFile = () => {
+            console.log("Du lieu luu trong data: ", data)
+
+            //xử dụng fetch gửi request
+            fetch(api, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(Response => Response.data)
+                .then(responseData => console.log(responseData))
+                .catch(err => console.log("Loi : ", err));
+
+        }
+
+
+    </script>
+</body>
+
+</html>
