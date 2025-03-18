@@ -9,10 +9,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "password", "email", "phone_number"]
         extra_kwargs = {"password": {"write_only": True}}
 
-    def create(self, validate_data):
-        validate_data["password"] = make_password(validate_data["password"])
-        user = User.objects.create(**validate_data)
+    def create(self, validated_data):
+        user = User.objects.create_user( 
+            username=validated_data["username"],
+            password=validated_data["password"],
+            email=validated_data["email"],
+            phone_number=validated_data["phone_number"]
+        )
         return user
+
+    def delete(self, instance):  # Sửa cú pháp: cần self
+        return instance.delete()
+
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,9 +34,8 @@ class AddressSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():  
             setattr(instance, attr, value)
         instance.save()  
-        return instance 
-    def delete(self, instance):
-        return instance.delete()
+        return instance
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,6 +46,11 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = "__all__"
+    
+
+    def create(self, validated_data):
+
+        return Property.objects.create(**validated_data)
 
 class ProductSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(write_only = True)
@@ -61,11 +73,15 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return product
 
-
 class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
         fields = "__all__"
+    def create(self, validated_data):
+        image = validated_data.pop('image')
+        image_url = file_uploader.upload_image(image)
+        return Variant.objects.create(image = image_url, **validated_data)
+
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
@@ -82,7 +98,14 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
-class OrderItemSerializer(serializers.ModelSerializer):
+class OrderDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OrderItem
+        model = OrderDetail
         fields = "__all__"
+
+class getProductSerializer( serializers.ModelSerializer):
+    category = serializers.CharField(source ="category.name")
+    class Meta: 
+        model = Product
+        fields = ["id","name", "category", "total_quantity","image_url","dimensions_mm","weight_in_grams"]
+    

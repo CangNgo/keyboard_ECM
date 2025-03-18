@@ -20,7 +20,7 @@ from api import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/user/register", views.CreateUserView.as_view(), name="register"),
+    path("api/user/register", views.CreateUserView.as_view(), name="register"), 
     path("api/category", views.CategoryView.as_view(), name="category"),
     path("api/category/<int:pk>", views.CategoryView.as_view(), name="category_detail"),
     path("api/property", views.PropertyView.as_view(), name="property"),
@@ -33,7 +33,14 @@ urlpatterns = [
     # Address
     path("api/address/", views.createAddress, name="create_address"),
     path("api/address/<int:pk>/", views.updateAddress, name="update_address"),
-    path("api-auth/", include("rest_framework.urls"))
+    path("api-auth/", include("rest_framework.urls")),
 
+    # variant
+    path("api/variant", views.addVariant, name="add_variant"),
 
+    #property
+    path("api/property", views.addProperties, name="add_property"),
+    
+    # getProduct
+    path("api/list_product", views.getListProduct.as_view(), name="get_list_product"),
 ]
