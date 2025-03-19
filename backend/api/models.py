@@ -19,11 +19,11 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
-    username = models.CharField(max_length=255, unique=True)  
+    username = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15)
-    is_staff = models.BooleanField(default=False)  
+    is_staff = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -36,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     city = models.CharField(max_length=255)
-    ward = models.CharField(max_length=255) 
+    ward = models.CharField(max_length=255)
     district = models.CharField(max_length=255)
     specific_address = models.CharField(max_length=255)
 
@@ -67,10 +67,10 @@ class Product(models.Model):
     properties = models.ManyToManyField(Property)
     created_at = models.DateField(auto_now_add=True)
     def __str__(self):
-        return self.name 
+        return self.name
 
 class Variant(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE, related_name='variants')
     name = models.CharField(max_length=255)
     price = models.DecimalField(
         max_digits=10,          # Total digits (including decimals)
