@@ -8,6 +8,6 @@ pytz
 sqlparse
 psycopg2-binary
 python-dotenv
-pymysqlin
+pymysql
 Pillow>=9.0.0
 minio

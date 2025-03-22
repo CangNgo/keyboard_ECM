@@ -1,9 +1,10 @@
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, viewsets
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.db.models import Min
 
 from . import models
 from . import serializer
@@ -132,15 +133,6 @@ def deleteAddress(request, pk, instance):
     serializerInstance.delete(instance)
     return Response({"message": "Xóa địa chỉ thành công"}, status=status.HTTP_200_OK)
 
-class ImageView(
-    generics.CreateAPIView,
-    generics.UpdateAPIView,
-):
-    queryset = models.Product.objects.all()
-    serializer_class = serializer.ProductSerializer
-    permission_classes = [AllowAny]
-
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def addProperties(request):
@@ -164,16 +156,19 @@ def addVariant(request):
         seria.save()
         return Response(seria.data, status=status.HTTP_201_CREATED)
 
-class getListProduct(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    generics.GenericAPIView
-): 
-    queryset = models.Product.objects.all()
-    serializer_class = serializer.getProductSerializer
+class ProductViewSet( viewsets.ModelViewSet):
     permission_classes =[AllowAny]
-    
-    def get(self, request, *args, **kwargs):
-        if 'pk' in kwargs:
-            return self.retrieve(request, *args, **kwargs)
-        return self.list(request, *args, **kwargs)
+    # queryset = models.Product.objects.annotate(
+    #     price = Min('variants__price')
+    # ).prefetch_related('properties')
+
+    def get_queryset(self):
+        if self.action == "retrieve":
+            # apply to preview product serializer with price field: variants + 2 underscores + field
+            return models.Product.objects.annotate(price = Min("variants__price"))
+        return models.Product.objects.all().prefetch_related("variants").prefetch_related("properties")
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return serializer.ProductSerializer
+        return serializer.PreviewProductSerializer
