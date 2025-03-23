@@ -27,6 +27,7 @@ urlpatterns = [
     path("api/property/<int:pk>", views.PropertyView.as_view(), name="property_detail"),
     path("api/product", views.ProductViewSet.as_view({'get': 'list'}), name="preview product"),
     path("api/product/<int:pk>", views.ProductViewSet.as_view({'get': 'retrieve'}), name="product_detail"),
+    path("api/order", views.OrderViewSet.as_view({'post': 'create'}), name="order"),
 
     path("api/token", TokenObtainPairView.as_view(), name="get_token"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh_token"),
@@ -34,7 +35,6 @@ urlpatterns = [
     # Address
     path("api/address/", views.createAddress, name="create_address"),
     path("api/address/<int:pk>/", views.updateAddress, name="update_address"),
-    path("api-auth/", include("rest_framework.urls")),
 
     # variant
     path("api/variant", views.addVariant, name="add_variant"),

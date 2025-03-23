@@ -158,9 +158,6 @@ def addVariant(request):
 
 class ProductViewSet( viewsets.ModelViewSet):
     permission_classes =[AllowAny]
-    # queryset = models.Product.objects.annotate(
-    #     price = Min('variants__price')
-    # ).prefetch_related('properties')
 
     def get_queryset(self):
         if self.action == "retrieve":
@@ -172,3 +169,65 @@ class ProductViewSet( viewsets.ModelViewSet):
         if self.action == "retrieve":
             return serializer.ProductSerializer
         return serializer.PreviewProductSerializer
+
+class OrderViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        if self.action == "create":
+            # apply to preview product serializer with price field: variants + 2 underscores + field
+            return models.Product.objects.all()
+        return models.Product.objects.all().prefetch_related("variants").prefetch_related("properties")
+
+    def get_serializer_class(self):
+        if self.action == "create":
+            return serializer.FormOrderSerializer
+        return serializer.PreviewProductSerializer
+
+    def create(self, request, *args, **kwargs):
+        user_id = 2
+        address_id = request.data.get('address_id')
+        cart_id = request.data.get('cart_id')
+
+        list = models.CartDetail.objects.filter(cart_id = cart_id).values_list('variant_id', 'quantity');
+
+        # Check stock quantity
+        order_detail_list = []
+        for (variant_id, quantity) in list:
+            variant = models.Variant.objects.filter(id = variant_id, quantity__gte=quantity).first()
+            if variant is None:
+              return Response({"error": "Invalid 'quantity' value"}, status=400)
+
+            # Update stock
+            variant.quantity -= quantity;
+            variant.save()
+
+            order_detail_list.append({"variant_id": variant_id, "quantity": quantity, "price": variant.price * quantity})
+
+        # create address
+        address = models.Address.objects.get(id=address_id)
+        address.pk = None
+        address.save(force_insert=True)
+
+        # create order with new address
+        order = models.Order.objects.create(
+            user_id = user_id,
+            address_id = address.pk,
+            status = 'PREPARING',
+            total_amount = sum(map(lambda item: item['price'], order_detail_list))
+        )
+        order.save()
+
+        for od in order_detail_list:
+            models.OrderDetail.objects.create(
+                order_id = order.pk,
+                variant_id = od['variant_id'],
+                quantity = od['quantity'],
+                total_amount = od['price']
+            ).save()
+
+        # delete cart detail
+        models.CartDetail.objects.filter(cart_id = cart_id).delete()
+        return Response({}, status=201)
+
+

@@ -94,6 +94,7 @@ class CartDetail(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
     total_amount = models.DecimalField(
         max_digits=10,          # Total digits (including decimals)
         decimal_places=2,       # Digits after decimal (e.g., 1234.56)

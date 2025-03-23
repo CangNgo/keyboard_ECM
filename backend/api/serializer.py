@@ -96,6 +96,14 @@ class CartDetailSerializer(serializers.ModelSerializer):
         model = CartDetail
         fields = "__all__"
 
+class FormOrderSerializer(serializers.ModelSerializer):
+    cart_id = serializers.CharField(write_only = True)
+    address_id = serializers.CharField(write_only = True)
+    class Meta:
+        model = Order
+        fields = ["cart_id", "address_id"]
+
+
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
