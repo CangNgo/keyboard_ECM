@@ -2,6 +2,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db.models import Min, Max
+from django.utils.html import format_html
+
 
 class UserManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
@@ -51,7 +54,7 @@ class Property(models.Model):
     name = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
     def __str__(self):
-        return self.name + " " + self.value
+        return self.name
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -66,6 +69,13 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     properties = models.ManyToManyField(Property)
     created_at = models.DateField(auto_now_add=True)
+
+    def min_price(self):
+        minPrice = self.variants.aggregate(Min('price'))
+        return minPrice['price__min'] if minPrice is not None else 0.00
+    def max_price(self):
+        maxPrice = self.variants.aggregate(Max('price'))
+        return maxPrice['price__max'] if maxPrice is not None else 0.00
     def __str__(self):
         return self.name
 
