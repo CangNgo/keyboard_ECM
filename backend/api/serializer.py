@@ -76,11 +76,11 @@ class ProductSerializer(serializers.ModelSerializer):
         return lowest.price if lowest else None
 
 class PreviewProductSerializer(serializers.ModelSerializer):
-    price = serializers.SerializerMethodField()
-
+    min_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    max_price = serializers.DecimalField(max_digits=10, decimal_places=2)
     class Meta:
         model = Product
-        fields = ['id', 'name', 'image_url', 'price']
+        fields = ['id', 'name', 'image_url', 'min_price', 'max_price']
 
     def get_price(self, product):
         lowest = product.variants.order_by('price').first()

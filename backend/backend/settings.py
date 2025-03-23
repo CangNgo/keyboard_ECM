@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'cartAPI',
-    'rest_framework_simplejwt',  # Thêm để dùng TokenObtainPairView
+    'rest_framework_simplejwt',
+    'cloudinary',
 ]
 
 AUTH_USER_MODEL = 'api.User'
@@ -103,3 +104,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 # Hoặc dùng CORS_ALLOW_ALL_ORIGINS = True để test (không khuyến khích cho production)
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'drohtlbju',
+    'API_KEY': '884386266326565',
+    'API_SECRET': 'D5fV24tiV0d5oKpVBDopjtaoEPQ',
+}
