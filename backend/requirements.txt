@@ -11,3 +11,4 @@ python-dotenv
 pymysql
 Pillow>=9.0.0
 minio
+cloudinary

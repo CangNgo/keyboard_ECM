@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0006_rename_orderitem_orderdetail_user_groups_and_more'),
+        ('api', '0007_alter_variant_product'),
     ]
 
     operations = [
@@ -15,10 +15,5 @@ class Migration(migrations.Migration):
             model_name='order',
             name='address',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='api.address'),
-        ),
-        migrations.AlterField(
-            model_name='variant',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='variants', to='api.product'),
-        ),
+        )
     ]
