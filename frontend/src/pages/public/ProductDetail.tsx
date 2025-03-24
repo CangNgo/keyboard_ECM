@@ -1,63 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import Image from '../../components/commons/Image';
-import Button from '../../components/commons/Button';
-import { findProductById } from '../../apis/productAPI';
-import { toast, Toaster } from 'sonner';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import Image from "../../components/commons/Image";
+import Button from "../../components/commons/Button";
+import { findProductById } from "../../apis/productAPI";
+import { toast, Toaster } from "sonner";
+import { Properties } from "xlsx";
 
 // Định nghĩa interface cho sản phẩm
 interface ProductDetail {
   id: string | null;
   name: string;
   price: number;
-  shortDescription?: string;
-  longDescription?: string;
-  images: { urlImage: string }[];
+  dimensions_mm?: string;
+  weight_in_grams?: string;
+  total_quantity?: number;
+  image_url?: string;
+  category?: number;
   color?: string;
-  size?: string|null;
+  size?: string | null;
   branch?: string;
   quantity?: number;
+}
+interface properties {
+  id: number;
+  name: string;
+  value: number;
+  category: number;
+}
+
+interface variants {
+  id: number;
+  name: string;
+  price: string;
+  quanity: number;
+  image_url: string;
+  sku: string;
+  product: number;
 }
 
 function ProductDetail() {
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [searchParams] = useSearchParams();
-  const [color, setColor] = useState('');
+  const [color, setColor] = useState("");
   const [size, setSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState<{ urlImage: string }[]>([])
-
+  const [imageUrl, setImageUrl] = useState<string>();
+  const [variant, setVariant] = useState<variants[]>([]);
+  const [properties, setProperties] = useState<Properties[]>([]);
+  const [currentVariant, setCurrentVariants] = useState<variants>();
   // Lấy giá trị của tham số 'id'
-  const productId = searchParams.get('id') || null;
+  const productId = searchParams.get("id") || null;
 
   useEffect(() => {
     const fetchProductDetail = async () => {
       if (!productId) {
-        setError('Không tìm thấy ID sản phẩm');
+        setError("Không tìm thấy ID sản phẩm");
         setLoading(false);
+        toast.error("Mã sản phẩm của m ddauauu!!!!! ");
         return;
       }
 
       try {
         const response = await findProductById(productId);
-        const product = response.data.products
-        const inventories = response.data.inventories
+        const product: ProductDetail = response;
+        setProperties(response.properties);
+        setVariant(response.variants);
+        setCurrentVariants(response.variants[0]);
         console.log("sản phẩm: ", product);
-        
         if (product) {
           setProduct(product);
           // Khởi tạo giá trị mặc định cho color và size nếu cần
-          setColor(inventories[0].color || '');
-          setSize(inventories[0].size || null);
-          setImageUrl(product?.images[0].urlImage)
-          console.log("Hình ảnh: ", product?.images[0].urlImage);
+          // setColor(inventories[0].color || '');
+          // setSize(inventories[0].size || null);
+          setImageUrl(product.image_url);
+          console.log("Hình ảnh: ", product.image_url);
         } else {
-          setError('Không tìm thấy sản phẩm');
+          setError("Không tìm thấy sản phẩm");
         }
       } catch (err) {
-        setError('Lỗi khi tải thông tin sản phẩm');
-        toast.error("Lỗi khi lấy sản phẩm")
+        setError("Lỗi khi tải thông tin sản phẩm");
+        toast.error("Gặp lỗi rồi anh eiii!");
       } finally {
         setLoading(false);
       }
@@ -66,8 +89,8 @@ function ProductDetail() {
     fetchProductDetail();
   }, [productId]);
 
-   // Xử lý khi chọn màu
-   const handleChangeColor = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Xử lý khi chọn màu
+  const handleChangeColor = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setColor(e.target.value);
   };
 
@@ -76,40 +99,41 @@ function ProductDetail() {
     setSize(e.target.value);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (id:number) => {
     if (!product) return;
 
     // Lấy danh sách sản phẩm từ localStorage (nếu có)
-    const items: ProductDetail[] = JSON.parse(localStorage.getItem('cartItems') || '[]');
-  
-    const existingItemIndex = items.findIndex(
-      (existingItem) => 
-        existingItem.id === product.id
-      //  && 
-        // existingItem.color === color && 
-        // existingItem.size === size
+    const items: ProductDetail[] = JSON.parse(
+      localStorage.getItem("cartItems") || "[]"
     );
-  
+
+    const existingItemIndex = items.findIndex(
+      (existingItem) => existingItem.id === product.id
+      //  &&
+      // existingItem.color === color &&
+      // existingItem.size === size
+    );
+
     if (existingItemIndex > -1) {
       // Nếu sản phẩm đã tồn tại, tăng số lượng
-      items[existingItemIndex].quantity = (items[existingItemIndex].quantity || 0) + 1;
+      items[existingItemIndex].quantity =
+        (items[existingItemIndex].quantity || 0) + 1;
     } else {
       // Nếu chưa tồn tại, thêm mới
       const newItem: ProductDetail = {
         ...product,
         quantity: 1,
-        color: color, 
+        color: color,
         size: size,
-        id:productId,
-        price: product.price
+        id: productId,
+        price: product.price,
       };
       items.push(newItem);
-
     }
-  
+
     // Lưu lại vào localStorage
-    localStorage.setItem('cartItems', JSON.stringify(items));
-    toast.success("Thêm vào giỏ hàng thành công")
+    localStorage.setItem("cartItems", JSON.stringify(items));
+    toast.success("Thêm vào giỏ hàng thành công");
   };
 
   const handleCheckoutNow = () => {
@@ -117,57 +141,43 @@ function ProductDetail() {
     // navigate('/checkout');
   };
   if (loading) return <div>Đang tải...</div>;
-  if (error) return <div>{error}</div>;
-  if (!product) return <div>Không tìm thấy sản phẩm</div>;
-
+  if (error)
+    return (
+      <div>
+        {error} <Toaster richColors position="top-right"></Toaster>
+      </div>
+    );
+  if (!product) return <div>Không tìm thấy sản phẩm </div>;
+  
+  const handleCurrentVariant = (id:number) => {
+    console.log("variant ID: ", id);
+    
+    const current = variant.filter((item) => item.id === id)
+    
+    setCurrentVariants(current[0])
+  }
   return (
     <div className="flex text-lg justify-between">
       <div className="w-1/3 pr-4">
         <div className="w-full h-full">
-          <Image 
-            classes="w-full h-full rounded-lg object-cover" 
-            src={product.images?.[0]?.urlImage || ''} 
+          <Image
+            classes="w-full h-full rounded-lg object-cover"
+            src={currentVariant?.image_url || ""}
           />
         </div>
       </div>
       <div className="w-1/3 pr-4">
         <div className="flex justify-start flex-row">
-          <div className="w-3/5 flex text-left">
-            <div className="w-1/2 flex flex-col">
+          <div className="w-full flex text-left">
+            <div className="w-2/5 flex flex-col">
               <span>Tên sản phẩm: </span>
-              <span>Mô tả: </span>
+              <span>Cân nặng: </span>
               <span>Giá: </span>
-              <span>Màu: </span>
-              <span>Kích cỡ: </span>
             </div>
-            <div className="w-1/2 flex justify-start flex-col">
-              <span className='text-red-500 font-medium'>{product.name}</span>
-              <span>{product.shortDescription || 'Không có mô tả'}</span>
-              <span>{product.price} VND</span>
-              <span>
-                <select
-                  name="shoes-color"
-                  className="p-0 w-40 border rounded-md focus:outline-none"
-                  id="shoes-color"
-                  value={color}
-                  onChange={handleChangeColor}
-                >
-                  {/* Thêm các option cho màu sắc nếu có */}
-                  <option value="">{color}</option>
-                </select>
-              </span>
-              <span>
-                <select
-                  name="shoes-size"
-                  className="p-0 w-40 border rounded-md focus:outline-none"
-                  id="shoes-size"
-                  value={size || ''}
-                  onChange={handleChangeSize}
-                >
-                  {/* Thêm các option cho kích thước nếu có */}
-                  <option >{size}</option>
-                </select>
-              </span>
+            <div className="w-3/5 flex justify-start flex-col">
+              <span className="text-red-500 font-medium">{product.name}</span>
+              <span>{product.weight_in_grams || "Không có cân nặng"} g </span>
+              <span>{currentVariant?.price} VND</span>
             </div>
           </div>
         </div>
@@ -180,19 +190,23 @@ function ProductDetail() {
           </Button>
           <Button
             className="bg-blue-300 focus:outline-none hover:bg-blue-400 w-2/3"
-            onClick={handleAddToCart}
+            onClick={() => handleAddToCart(currentVariant.id)}
           >
             Thêm vào giỏ hàng
           </Button>
         </div>
-        <div>{product.longDescription}</div>
+        {/* <div>{product.longDescription}</div> */}
       </div>
       <div className="w-1/3 pr-4">
-        {product.images?.[1] && (
-          <Image src={product.images[1].urlImage} />
-        )}
+        <div className="flex flex-wrap justify-between">
+          {variant.map((item) => (
+            <div key={item.id} className="w-24 h-24 " onClick={() => handleCurrentVariant(item.id)}>
+              <img src={item.image_url} alt="" />
+            </div>
+          ))}
+        </div>
       </div>
-      <Toaster richColors position='top-right'/>
+      <Toaster richColors position="top-right" />
     </div>
   );
 }

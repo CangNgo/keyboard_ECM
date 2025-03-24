@@ -94,7 +94,19 @@ class CartSerializer(serializers.ModelSerializer):
 class CartDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartDetail
-        fields = "__all__"
+        fields = ['id', 'cart', 'variant', 'quantity']
+        read_only_fields = ['cart']
+
+class AddCartDetailSerializer(serializers.ModelSerializer):
+    variantId = serializers.IntegerField()
+    quantity = serializers.IntegerField(min_value=1)
+    def create(self, validated_data):
+        user = self.context['request'].user
+        variant = Variant.objects.get(id=validated_data['variantId'])
+        print("user: " + user.username)
+        cart, created = Cart.objects.get_or_create(user=user)
+
+        cartDetail = CartDetail.objects.create(cart=cart, variant=variant, quantity=validated_data['quantity'])
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "../../components/commons/Button";
-import Image from "../../components/commons/Image";
+import Button from "./Button";
+import Image from "./Image";
 import { faAdd, faMinus } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import useFormatCurrency from "../../hooks/useFormatCurrency";

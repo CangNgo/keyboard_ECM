@@ -1,96 +1,79 @@
-import React, { useState } from "react";
-
+// src/pages/Login.tsx
+import React, { useState, ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { login } from "../../apis/userAPI";
 import Button from "../../components/commons/Button";
 import TextField from "../../components/commons/TextField";
+import { useAuth } from "../../store/AuthContext";
 
-interface Logo {
-  name: string;
-  src: string;
+interface LoginData {
+  username: string;
+  password: string;
 }
 
-// interface LoginProps {
-//   username?: string;
-//   currency?: string;
-//   type?: string;
-// }
+interface LoginResponse {
+  access: string;
+  data: {
+    username: string;
+    // Thêm các thuộc tính khác nếu API trả về
+  };
+}
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const Navigate = useNavigate()
-  let checkUsername = false;
-  let checkPassowrd = false;
-  //error
-  const [errorUsername, setErrorUsername] = useState("");
-  const [errorPassword, setErrorPassword] = useState("");
-
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
-  //check
-  const handleCheckUsername = (username: string) => {
-    if (username === "") {
-      setUsername("Vui lòng nhập username");
-      return;
+  const [errorUsername, setErrorUsername] = useState<string>("");
+  const [errorPassword, setErrorPassword] = useState<string>("");
+
+  const handleCheckUsername = (username: string): boolean => {
+    if (!username) {
+      setErrorUsername("Vui lòng nhập username");
+      return false;
     }
-    setUsername("");
-    checkUsername = true;
+    setErrorUsername("");
+    return true;
   };
 
-  const handleCheckPassword = (password: string) => {
-    if (password === "") {
+  const handleCheckPassword = (password: string): boolean => {
+    if (!password) {
       setErrorPassword("Password không được để trống");
-      return;
+      return false;
     }
-
-    // if (password.length < 8) {
-    //   setErrorPassword("Mật khẩu không được bé hơn 8 ");
-    //   return;
-    // }
-
     setErrorPassword("");
-    checkPassowrd = true;
+    return true;
   };
 
-  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmail = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
 
-  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePassword = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
   const handleLogin = async () => {
-    handleCheckUsername(username);
-    handleCheckPassword(password);
-    //kiem tra du lieu
+    const isUsernameValid = handleCheckUsername(username);
+    const isPasswordValid = handleCheckPassword(password);
+
+    if (!isUsernameValid || !isPasswordValid) return;
 
     try {
-      if (!username || !checkPassowrd) return;
-      const loginData = {
-        username,
-        password,
-      };
-      const response = await login(loginData);
-      console.log("login page" ,response);
-
-      if (response) {
-        localStorage.setItem("auth_token", response.access);
-        // localStorage.setItem(
-        //   "auth_role",
-        //   response.data.role ? "ADMIN" : "SUPPER_ADMIN"
-        // );
-        toast.success("Đăng nhập thành công")
-        setTimeout(() => {
-          navigate("/")
-        }, 1500)
-
-      } else {
-        toast.success("Đăng nhập thất bại");
-      }
+      const loginData: LoginData = { username, password };
+      const response = await login(loginData) as LoginResponse;
       
+      if (response) {
+        authLogin(response.data, response.access);
+        toast.success("Đăng nhập thành công");
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
+      } else {
+        toast.error("Đăng nhập thất bại");
+      }
     } catch (error: unknown) {
       toast.error("Tài khoản không tồn tại");
     }
@@ -104,9 +87,6 @@ function Login() {
         </Button>
       </div>
       <div className="w-80">
-        <div className="">
-          <img src="" alt="" />
-        </div>
         <div className="font-bold text-4xl text-left p-2">Đăng nhập</div>
         <TextField
           tabIndex={1}
@@ -129,7 +109,7 @@ function Login() {
             outline
             large
             primary
-            className=" bg-transparent hover:bg-yellow-100 active:border-indigo-400"
+            className="bg-transparent hover:bg-yellow-100 active:border-indigo-400"
             onClick={handleLogin}
           >
             Đăng nhập
@@ -140,7 +120,6 @@ function Login() {
             Đăng ký
           </Link>
         </div>
-
         <Toaster richColors position="top-right" />
       </div>
     </div>

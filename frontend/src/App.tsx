@@ -3,6 +3,7 @@ import { LayoutRouteProps, Navigate, Route, Routes } from "react-router-dom";
 import { adminConfig, userConfig, publicConfig } from "./routes/routes";
 import NotFound from "./routes/NotFound";
 import DefaultLayout from "./components/layouts/DefaultLayout";
+import { AuthProvider } from "./store/AuthContext";
 
 // Định nghĩa interface RouteConfig
 export interface RouteConfig {
@@ -44,16 +45,18 @@ function App() {
   };
 
   return (
-    <Routes>
-      {publicConfig.map(renderRoute)}
+    <AuthProvider>
+      <Routes>
+        {publicConfig.map(renderRoute)}
 
-      {role === "SUPPER_ADMIN" && userConfig.map(renderRoute)}
+        {role === "SUPPER_ADMIN" && userConfig.map(renderRoute)}
 
-      {role === "ADMIN" && adminConfig.map(renderRoute)}
+        {role === "ADMIN" && adminConfig.map(renderRoute)}
 
-      {/* Handle 404 */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* Handle 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

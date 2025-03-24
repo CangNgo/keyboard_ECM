@@ -44,4 +44,5 @@ urlpatterns = [
 
     # getProduct
     # path("api/list_product", views.ProductView.as_view(), name="get_list_product"),
+    path("api/", include("cartAPI.urls")),
 ]

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
-const useFormatCurrency = (amount: number) => {
+const useFormatCurrency = (amount: number|undefined) => {
+  if (!amount) amount = 0
   return useMemo(() => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
