@@ -2,7 +2,7 @@ import React from "react";
 import Image from "./Image";
 import useFormatCurrency from "../../hooks/useFormatCurrency";
 interface ProdcutPtops {
-  id: string;
+  id: number;
   title: string;
   description?: string;
   image: string;
@@ -13,9 +13,11 @@ interface ProdcutPtops {
   small?: boolean;
   medium?: boolean;
   large?: boolean;
-  price?: number; 
+  price?: string; 
+  min_price: number|undefined;
+  max_price:number|undefined;
   index?:number;
-  onclick: (id: string) => void;
+  onclick: (id: number) => void;
 }
 function ShoesItem({
   id,
@@ -29,12 +31,15 @@ function ShoesItem({
   classesImg,
   classesTitle = " text-md w-full text-center",
   classesDescription = "  text-md w-full text-center",
-  price = 0, 
+  price = "0", 
+  min_price, 
+  max_price,
   onclick,
   index
 }: ProdcutPtops) {
   //điều chỉnh props
-const priceItem = useFormatCurrency(price)
+const minPrice = useFormatCurrency(min_price)
+const maxPrice = useFormatCurrency(max_price)
   //size small
   if (small) {
     classes += " w-16 text-small mr-4";
@@ -68,7 +73,7 @@ const priceItem = useFormatCurrency(price)
       </div>
       <div className={`${classesTitle} text-center`}>{title}</div>
       <div className={`${classesDescription} text-center`}>{description}</div>
-      {large && (<div className="text-red-400 font-bold text-center">{priceItem}</div>)}
+      {large && (<div className="text-red-400 font-bold text-center">{minPrice + " - "+ maxPrice}</div>)}
     </div>
   );
 }

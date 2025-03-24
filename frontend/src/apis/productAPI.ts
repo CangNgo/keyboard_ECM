@@ -1,6 +1,6 @@
 import axiosJWT from "../config/axiosJWTConfig"
 import { DOMAIN } from './index';
-import { AddProduct } from './../types/product';
+import { AddProduct } from '../types/product';
 import axios from "axios";
 
 interface page {
@@ -15,9 +15,7 @@ export const findAllProduct = async () => {
         limitPage:8
     }
     try {
-        const response = await axiosJWT.get(`${DOMAIN}/skeleton/public/v1/product`, {
-           params:page
-        })
+        const response = await axiosJWT.get(`${DOMAIN}/api/product`)
         return response.data
     } catch (error) {
         console.error('Error fetching all activities:', error);
@@ -27,9 +25,8 @@ export const findAllProduct = async () => {
 
 export const findProductById = async (id: string) => {
     try {
-        const response = await axiosJWT.get(`${DOMAIN}/skeleton/public/v1/product/${id}`)
+        const response = await axiosJWT.get(`${DOMAIN}/api/product/${id}`)
         console.log(response.data);
-        
         return response.data
     } catch (error) {
         console.error('Error fetching all activities:', error);

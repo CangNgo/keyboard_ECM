@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
-import NavigationMenu from "../commons/NavigationMenu";
-import SearchBar from "../commons/SearchBar";
-import Image from "../commons/Image";
+import NavigationMenu from "./NavigationMenu";
+import SearchBar from "./SearchBar";
+import Image from "./Image";
 import cang from "../../assets/img/462174035_1265880167773698_7926684173028503711_n.jpg"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,8 +11,8 @@ import {
   faTable,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import { productCategories } from "../commons/categoriesProduct";
-import { userCategories } from "../commons/categoriesUser";
+import { productCategories } from "./categoriesProduct";
+import { userCategories } from "./categoriesUser";
 import Button from "./Button";
 import { useNavigate } from "react-router-dom";
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import ShoesItem from './../../components/commons/ShoesItem';
-import Image from './../../components/commons/Image';
+import ShoesItem from '../../components/commons/ShoesItem';
+import Image from '../../components/commons/Image';
 import ListProduct from "../../components/commons/ListProduct";
 import { findAllProduct } from "../../apis/productAPI";
 
@@ -10,12 +10,11 @@ export interface ImageData {
 }
 
 export interface Product {
-  id: string;
-  images: ImageData[]; 
+  id: number;
+  image_url: string; 
   name: string;
-  price: number;
-  shortDescription: string;
-  longDescription: string;
+  min_price: number;
+  max_price: number;
 }
 
 function Home() {
@@ -25,8 +24,8 @@ function Home() {
 
     const fetchAllProduct = async () => {
       const response = await findAllProduct()
-      console.log(response.data);
-      setProduct(response.data)
+      console.log(response);
+      setProduct(response)
       console.log("Product : ", product);
     }
     fetchAllProduct()

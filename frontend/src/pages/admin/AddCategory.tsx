@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import TextField from './../../components/commons/TextField';
+import TextField from '../../components/commons/TextField';
 import SelectBox from "../../components/commons/SelectBox";
 import Button from "../../components/commons/Button";
 import { addCategory, findAllCategory } from "../../apis/categoryAPI";
